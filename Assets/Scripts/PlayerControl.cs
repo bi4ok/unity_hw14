@@ -7,6 +7,7 @@ namespace WildBall.Inputs
     [RequireComponent(typeof(MovementControl))]
     public class PlayerControl : MonoBehaviour
     {
+        [SerializeField] private GameObject _cameraObject;
         private Vector3 _playerPosition;
         private MovementControl _playerMove;
         private Animator _playerAnimation;
@@ -26,7 +27,14 @@ namespace WildBall.Inputs
 
         private void Update()
         {
-            _playerPosition = new Vector3(-Input.GetAxis(PlayerInputs.HORIZONTAL_AXIS), 0.0f, -Input.GetAxis(PlayerInputs.VERTICAL_AXIS));
+            //_playerPosition = new Vector3(-Input.GetAxis(PlayerInputs.HORIZONTAL_AXIS), 0.0f, -Input.GetAxis(PlayerInputs.VERTICAL_AXIS));
+            var input = Vector2.zero;
+            input.x = Input.GetAxis("Vertical");
+            input.y = Input.GetAxis("Horizontal");
+            input = Vector2.ClampMagnitude(input, 1f);
+            var forward = Vector3.ProjectOnPlane(_cameraObject.transform.forward, Vector3.up);
+            var right = Vector3.ProjectOnPlane(_cameraObject.transform.right, Vector3.up);
+            _playerPosition = forward.normalized * input.x + right.normalized * input.y;
             _playerAnimation.SetFloat("Velocity", _playerBody.velocity.magnitude);
 
         }
